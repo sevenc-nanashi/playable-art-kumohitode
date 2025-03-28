@@ -1,0 +1,25 @@
+{
+  "name": "20250328_kumohitode_art",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "tools:keys": "node --experimental-strip-types ./tools/keys.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.14",
+    "@types/p5": "^1.7.6",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.0",
+    "vite-plugin-hmrify": "^0.1.0",
+    "zx": "^8.4.1"
+  },
+  "dependencies": {
+    "@tonejs/midi": "^2.0.28",
+    "midi-file": "^1.2.4",
+    "p5": "^1.11.3"
+  }
+}

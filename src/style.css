@@ -1,0 +1,18 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+main {
+  canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    width: 100% !important;
+    height: 100% !important;
+    aspect-ratio: 16 / 9;
+    image-rendering: pixelated;
+    object-fit: cover;
+  }
+}
