@@ -2,6 +2,7 @@
   "name": "20250328_kumohitode_art",
   "private": true,
   "version": "0.0.0",
+  "packageManager": "pnpm@10.6.3",
   "type": "module",
   "scripts": {
     "dev": "vite",

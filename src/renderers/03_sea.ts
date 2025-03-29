@@ -4,7 +4,13 @@ import maskUrl from "../assets/mask.png";
 import seaSoundUrl from "../assets/sea.ogg";
 import commonVert from "../shaders/common.vert?raw";
 import maskFrag from "../shaders/mask.frag?raw";
-import { getMousePos, myPreload, useDrawingContext } from "../utils";
+import {
+  audioContext,
+  getCurrentBeat,
+  getMousePos,
+  myPreload,
+  useDrawingContext,
+} from "../utils";
 import { frameRate, framesPerBeat } from "../consts";
 import { clip, easeOutQuart, unlerp } from "../easing";
 
@@ -12,17 +18,10 @@ let shader: p5.Shader;
 let graphics: p5.Graphics;
 let seaImage: p5.Image;
 let maskImage: p5.Image;
-let seaSound: { value: AudioBufferSourceNode };
+let seaBuffer: AudioBuffer;
 let seaSoundGain: GainNode;
 
 let startQueue = false;
-const audioContext = new AudioContext();
-audioContext.onstatechange = () => {
-  if (audioContext.state === "running") {
-    console.log("audioContext is running");
-    startQueue = false;
-  }
-};
 
 const seaWidth = 168;
 const seaHeight = 84;
@@ -35,22 +34,17 @@ export const preload = import.meta.hmrify((p: p5) => {
   seaSoundGain = audioContext.createGain();
   seaSoundGain.connect(audioContext.destination);
 
-  seaSound = myPreload(p, async () => {
+  myPreload(p, async () => {
     const buffer = await fetch(seaSoundUrl).then((res) => res.arrayBuffer());
-    const audioBuffer = await audioContext.decodeAudioData(buffer);
-    const source = audioContext.createBufferSource();
-    source.buffer = audioBuffer;
-    source.loop = true;
-    source.connect(seaSoundGain);
-    source.start();
-
-    return source;
+    seaBuffer = await audioContext.decodeAudioData(buffer);
   });
 });
 
 export const setup = import.meta.hmrify((p: p5) => {
   graphics = p.createGraphics(p.width, p.height, p.WEBGL);
 });
+
+let lastPlayedBeat = -1000;
 
 export const draw = import.meta.hmrify((p: p5) => {
   if (!shader) {
@@ -62,21 +56,16 @@ export const draw = import.meta.hmrify((p: p5) => {
 
   using _context = useDrawingContext(p);
 
-  const seqLength = framesPerBeat * 16;
-  const currentSeqFrame = p.frameCount % seqLength;
-
-  if (audioContext.state === "suspended" && p.mouseIsPressed && !startQueue) {
-    startQueue = true;
-    setTimeout(
-      () => {
-        audioContext.resume();
-      },
-      (seqLength - currentSeqFrame + framesPerBeat * 2) * (1000 / frameRate),
-    );
+  const currentBeat = getCurrentBeat();
+  if (currentBeat - lastPlayedBeat >= 16) {
+    const source = audioContext.createBufferSource();
+    source.buffer = seaBuffer;
+    source.connect(seaSoundGain);
+    source.start();
+    lastPlayedBeat = Math.floor(currentBeat / 16) * 16;
   }
 
-  const seaYRatio =
-    Math.sin((currentSeqFrame / seqLength) * Math.PI * 2) / 2 + 0.5;
+  const seaYRatio = Math.sin((currentBeat / 16) * Math.PI * 2) / 2 + 0.5;
 
   updateSeaSound(p, seaYRatio);
   drawSea(p, seaYRatio);
@@ -107,12 +96,6 @@ function updateSeaSound(p: p5, seaYRatio: number) {
 
 if (import.meta.hot) {
   import.meta.hot.dispose(() => {
-    try {
-      seaSound.value.stop();
-    } catch {}
-
     seaSoundGain.disconnect();
-
-    audioContext.close();
   });
 }

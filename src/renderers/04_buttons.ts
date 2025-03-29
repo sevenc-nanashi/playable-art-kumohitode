@@ -1,12 +1,14 @@
 import p5 from "p5";
 import buttonsUrl from "../assets/buttons.png";
 import {
+  audioContext,
   getBottomLeft,
+  getMouseFrames,
   getMousePos,
+  mouseConsumed,
   myPreload,
   useDrawingContext,
 } from "../utils";
-import { frameRate, framesPerBeat, msPerBeat } from "../consts";
 import { akaneColor, aoiColor, shadowColor } from "../colors";
 import kickSoundUrl from "../assets/kick.ogg";
 import snareSoundUrl from "../assets/snare.ogg";
@@ -24,23 +26,18 @@ const buttonSize = 24;
 const buttonPadding = 5;
 const buttonGap = 4;
 
-const audioContext = new AudioContext();
 const gainNode = audioContext.createGain();
 gainNode.gain.value = 0.5;
 gainNode.connect(audioContext.destination);
 
-let queueInterval: ReturnType<typeof setInterval> | undefined;
-let queueTimeouts: ReturnType<typeof setTimeout>[] = [];
-
 type ButtonState = "neutral" | "active" | "disabled";
 
-const buttonNames = ["kick", "snare", "dial", "metronome"] as const;
+const buttonNames = ["kick", "snare", "dial"] as const;
 type ButtonName = (typeof buttonNames)[number];
 const buttonStates: Record<ButtonName, ButtonState> = {
   kick: "neutral",
   snare: "neutral",
   dial: "neutral",
-  metronome: "neutral",
 };
 
 export const preload = import.meta.hmrify((p: p5) => {
@@ -64,24 +61,14 @@ export const preload = import.meta.hmrify((p: p5) => {
   });
 });
 
-let clickFrames = 0;
-
 export const draw = import.meta.hmrify((p: p5) => {
   if (!image) {
     preload(p);
   }
 
-  if (p.mouseIsPressed) {
-    clickFrames += 1;
-  } else {
-    clickFrames = 0;
-  }
-
   const bottomLeft = getBottomLeft(p);
 
   const mousePos = getMousePos(p);
-
-  buttonStates.metronome = queueInterval ? "active" : "neutral";
 
   const hoveredButton = getHoveredButton(bottomLeft, mousePos);
 
@@ -93,6 +80,7 @@ function drawButtons(
   bottomLeft: { x: number; y: number },
   hoveredButton: ButtonName | undefined,
 ) {
+  const mouseFrames = getMouseFrames();
   for (let i = 0; i < buttonNames.length; i++) {
     using _context = useDrawingContext(p);
     const imageX = i * (originalButtonSize + originalButtonPadding);
@@ -101,7 +89,7 @@ function drawButtons(
     const x = bottomLeft.x + i * (buttonSize + buttonGap) + buttonPadding;
     const y = bottomLeft.y - buttonSize - buttonPadding;
 
-    const isClicking = clickFrames > 0 && hoveredButton === buttonNames[i];
+    const isClicking = mouseFrames > 0 && hoveredButton === buttonNames[i];
     if (!isClicking) {
       using _context = useDrawingContext(p);
       p.tint(...shadowColor);
@@ -119,8 +107,9 @@ function drawButtons(
     }
     if (buttonStates[buttonNames[i]] === "disabled") {
       p.tint(255, 128);
-    } else if (clickFrames === 1 && hoveredButton === buttonNames[i]) {
+    } else if (mouseFrames === 1 && hoveredButton === buttonNames[i]) {
       onButtonPress(p, buttonNames[i]);
+      mouseConsumed.value = true;
     }
     if (buttonStates[buttonNames[i]] === "active") {
       if (i % 2 === 0) {
@@ -201,36 +190,7 @@ function onButtonPress(p: p5, button: ButtonName) {
     playSound(snareSoundBuffer);
   } else if (button === "dial") {
     playSound(dialSoundBuffer);
-  } else if (button === "metronome") {
-    startMetronomeQueue(p);
   }
-}
-
-function startMetronomeQueue(p: p5) {
-  if (queueInterval) {
-    clearInterval(queueInterval);
-    queueInterval = undefined;
-    queueTimeouts.forEach((timeout) => clearTimeout(timeout));
-    queueTimeouts = [];
-    return;
-  }
-
-  const currentSeqFrame = p.frameCount % framesPerBeat;
-
-  setTimeout(
-    () => {
-      let i = 0;
-      queueInterval = setInterval(() => {
-        i += 1;
-        if (i % 2 === 0) {
-          playSound(kickSoundBuffer);
-        } else {
-          playSound(snareSoundBuffer);
-        }
-      }, msPerBeat);
-    },
-    (framesPerBeat - currentSeqFrame) * (1000 / frameRate),
-  );
 }
 
 function playSound(buffer: AudioBuffer) {
@@ -242,19 +202,6 @@ function playSound(buffer: AudioBuffer) {
 
 if (import.meta.hot) {
   import.meta.hot.dispose(() => {
-    try {
-      audioContext.suspend();
-    } catch {}
-
-    if (queueTimeouts.length) {
-      for (const timeout of queueTimeouts) {
-        clearTimeout(timeout);
-      }
-    }
-    if (queueInterval) {
-      clearInterval(queueInterval);
-    }
-
-    audioContext.close();
+    gainNode.disconnect();
   });
 }

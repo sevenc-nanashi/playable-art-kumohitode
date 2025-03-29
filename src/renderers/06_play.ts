@@ -1,6 +1,6 @@
 import p5 from "p5";
 import seq from "../assets/seq.mid?mid";
-import { getMousePos, myPreload } from "../utils";
+import { audioContext, getMousePos, mouseConsumed, myPreload } from "../utils";
 
 const keysToAudioBuffer: Record<number, AudioBuffer> = {};
 const backupKeysNode: Record<number, AudioBufferSourceNode> = {};
@@ -23,7 +23,6 @@ const particles: Particle[] = [];
 
 const seqTrack = seq.tracks.find((track) => track.name === "seq")!;
 
-const audioContext = new AudioContext();
 const gainNode = audioContext.createGain();
 gainNode.gain.value = 0.5;
 gainNode.connect(audioContext.destination);
@@ -60,7 +59,8 @@ export const draw = import.meta.hmrify((p: p5) => {
 
   const mousePos = getMousePos(p);
 
-  if (p.mouseIsPressed && clickFrames === 1) {
+  if (p.mouseIsPressed && clickFrames === 1 && !mouseConsumed.value) {
+    mouseConsumed.value = true;
     seqIndex += 1;
     seqIndex %= seqTrack.notes.length;
 
@@ -109,10 +109,6 @@ export const draw = import.meta.hmrify((p: p5) => {
 
 if (import.meta.hot) {
   import.meta.hot.dispose(() => {
-    try {
-      audioContext.suspend();
-    } catch {}
-
-    audioContext.close();
+    gainNode.disconnect();
   });
 }

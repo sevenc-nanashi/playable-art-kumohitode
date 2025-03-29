@@ -1,4 +1,5 @@
 import p5 from "p5";
+import { msPerBeat } from "./consts";
 
 export const useDrawingContext = (target: {
   push: () => void;
@@ -80,3 +81,28 @@ export const getMousePos = (p: p5) => {
     };
   }
 };
+
+let baseMs: number;
+export const setBaseMs = () => {
+  baseMs = performance.now();
+};
+export const getCurrentBeat = () => {
+  return (performance.now() - baseMs) / msPerBeat;
+};
+
+let mouseFrames = 0;
+export const updateMouseFrames = (p: p5) => {
+  if (p.mouseIsPressed) {
+    mouseFrames += 1;
+  } else {
+    mouseFrames = 0;
+  }
+};
+
+export const mouseConsumed = { value: false };
+
+export const getMouseFrames = () => {
+  return mouseFrames;
+};
+
+export const audioContext = new AudioContext();

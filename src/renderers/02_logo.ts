@@ -1,7 +1,12 @@
 import p5 from "p5";
 import logoUrl from "../assets/logo.png";
 import misakiGothic from "../assets/misaki_gothic.ttf";
-import { getMousePos, getTopLeft } from "../utils";
+import {
+  getMouseFrames,
+  getMousePos,
+  getTopLeft,
+  mouseConsumed,
+} from "../utils";
 import { clip, easeOutQuart, rightClip, unlerp } from "../easing";
 import { framesPerBeat } from "../consts";
 import { useDrawingContext } from "../utils";
@@ -50,12 +55,6 @@ function drawLogo(p: p5) {
   const originY = logoPadding;
   p.image(image, originX, originY);
 
-  if (p.mouseIsPressed) {
-    mouseFrames += 1;
-  } else {
-    mouseFrames = 0;
-  }
-
   p.fill(...shadowColor);
   p.rect(0, originY + logoHeight + 1, originX + logoWidth + 1, 2);
 
@@ -76,7 +75,6 @@ const lines: Line[] = [
   },
 ];
 
-let mouseFrames = 0;
 function drawText(
   p: p5,
   args: { interactive?: boolean; x?: number; y?: number } = {},
@@ -89,6 +87,7 @@ function drawText(
   p.textAlign(p.LEFT, p.TOP);
 
   const mousePos = getMousePos(p);
+  const mouseFrames = getMouseFrames();
 
   for (const [i, line] of lines.entries()) {
     using _context = useDrawingContext(p);
@@ -110,8 +109,8 @@ function drawText(
         mousePos.y <= args.y + originY + fontSize
       ) {
         p.fill(255, 255, 255, 192);
-        if (mouseFrames === 1) {
-          console.log(line.url);
+        if (mouseFrames === 1 && !mouseConsumed.value) {
+          mouseConsumed.value = true;
           window.open(line.url, "_blank");
         }
       }
