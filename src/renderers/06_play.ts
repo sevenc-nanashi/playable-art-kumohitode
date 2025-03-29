@@ -10,7 +10,7 @@ const urls = import.meta.glob<string>("../assets/keys/*.ogg", {
   import: "default",
 });
 
-type Particle = {
+export type Particle = {
   pos: p5.Vector;
   vel: p5.Vector;
   size: number;
