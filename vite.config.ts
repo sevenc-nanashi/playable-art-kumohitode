@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import { defineConfig } from "vite";
 import hmrify from "vite-plugin-hmrify";
 export default defineConfig({
+  base: "/playable-art-kumohitode/",
   server: {
     allowedHosts: true,
   },
