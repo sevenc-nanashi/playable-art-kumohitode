@@ -2,6 +2,9 @@ import fs from "node:fs/promises";
 import { defineConfig } from "vite";
 import hmrify from "vite-plugin-hmrify";
 export default defineConfig({
+  server: {
+    allowedHosts: true,
+  },
   plugins: [
     hmrify(),
     {
@@ -13,11 +16,9 @@ export default defineConfig({
           const buffer = await fs.readFile(file);
           return `
           import { Midi } from "@tonejs/midi";
-          import { parseMidi } from "midi-file";
 
           const buffer = new Uint8Array([${buffer.join(",")}]);
           export const toneJsMidi = new Midi(buffer);
-          export const rawMidi = parseMidi(buffer);
           export default toneJsMidi;
           `;
         }

@@ -1,12 +1,15 @@
 export const easeOutQuad = (t: number) => t * (2 - t);
+export const easeInQuad = (t: number) => t * t;
 export const easeInOutQuad = (t: number) =>
   t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
 
 export const easeOutCubic = (t: number) => --t * t * t + 1;
+export const easeInCubic = (t: number) => t * t * t;
 export const easeInOutCubic = (t: number) =>
   t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
 
 export const easeOutQuart = (t: number) => 1 - --t * t * t * t;
+export const easeInQuart = (t: number) => t * t * t * t;
 export const easeInOutQuart = (t: number) =>
   t < 0.5 ? 8 * t * t * t * t : 1 - 8 * --t * t * t * t;
 

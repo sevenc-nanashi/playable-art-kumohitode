@@ -8,12 +8,12 @@ importers:
 
   .:
     dependencies:
+      '@hazae41/symbol-dispose-polyfill':
+        specifier: ^1.0.2
+        version: 1.0.2
       '@tonejs/midi':
         specifier: ^2.0.28
         version: 2.0.28
-      midi-file:
-        specifier: ^1.2.4
-        version: 1.2.4
       p5:
         specifier: ^1.11.3
         version: 1.11.3
@@ -326,6 +326,9 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
+
+  '@hazae41/symbol-dispose-polyfill@1.0.2':
+    resolution: {integrity: sha512-Jjlfw/K3A4Abl2QijyaAq4Xx+FN8Xu6132vqGUnNj3pFzPg+bGq6pytalvTEzU0o/VEOn7/hDnJ5v1NlCjUXkQ==}
 
   '@rollup/rollup-android-arm-eabi@4.37.0':
     resolution: {integrity: sha512-l7StVw6WAa8l3vA1ov80jyetOAEo1FtHvZDbzXDO/02Sq/QVvqlHkYoFwDJPIMj0GKiistsBudfx5tGFnwYWDQ==}
@@ -716,6 +719,8 @@ snapshots:
 
   '@esbuild/win32-x64@0.25.1':
     optional: true
+
+  '@hazae41/symbol-dispose-polyfill@1.0.2': {}
 
   '@rollup/rollup-android-arm-eabi@4.37.0':
     optional: true

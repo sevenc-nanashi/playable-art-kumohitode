@@ -1,3 +1,4 @@
+import "@hazae41/symbol-dispose-polyfill"
 import { frameRate, height, width } from "./consts";
 import "./style.css";
 import p5 from "p5";

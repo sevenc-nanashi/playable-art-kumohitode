@@ -41,3 +41,42 @@ export const getTopLeft = (p: p5) => {
     };
   }
 };
+
+export const getBottomLeft = (p: p5) => {
+  const { x, y } = getTopLeft(p);
+  return { x, y: p.height - y };
+};
+
+export const getTopRight = (p: p5) => {
+  const { x, y } = getTopLeft(p);
+  return { x: p.width - x, y };
+};
+
+export const getBottomRight = (p: p5) => {
+  const { x, y } = getTopLeft(p);
+  return { x: p.width - x, y: p.height - y };
+};
+
+export const getMousePos = (p: p5) => {
+  const windowX = p.mouseX / p.width;
+  const windowY = p.mouseY / p.height;
+
+  const canvasRatio = p.width / p.height;
+  const windowRatio = window.innerWidth / window.innerHeight;
+
+  const larger = Math.max(canvasRatio / windowRatio, windowRatio / canvasRatio);
+
+  const topLeft = getTopLeft(p);
+
+  if (windowRatio > canvasRatio) {
+    return {
+      x: windowX * p.width,
+      y: (windowY * p.height) / larger + topLeft.y,
+    };
+  } else {
+    return {
+      x: (windowX * p.width) / larger + topLeft.x,
+      y: windowY * p.height,
+    };
+  }
+};
