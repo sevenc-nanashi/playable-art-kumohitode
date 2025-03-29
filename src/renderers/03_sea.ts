@@ -12,6 +12,7 @@ import {
   useDrawingContext,
 } from "../utils";
 import { clip, easeOutQuart, unlerp } from "../easing";
+import { msPerBeat } from "../consts";
 
 let shader: p5.Shader;
 let graphics: p5.Graphics;
@@ -58,11 +59,13 @@ export const draw = import.meta.hmrify((p: p5) => {
     const source = audioContext.createBufferSource();
     source.buffer = seaBuffer;
     source.connect(seaSoundGain);
-    source.start();
+    source.start(
+      lastPlayedBeat === -1000 ? ((currentBeat % 16) * msPerBeat) / 1000 : 0,
+    );
     lastPlayedBeat = Math.floor(currentBeat / 16) * 16;
   }
 
-  const seaYRatio = Math.sin((currentBeat / 16) * Math.PI * 2) / 2 + 0.5;
+  const seaYRatio = Math.cos((currentBeat / 16) * Math.PI * 2) / 2 + 0.5;
 
   updateSeaSound(p, seaYRatio);
   drawSea(p, seaYRatio);
