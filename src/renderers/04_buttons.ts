@@ -108,7 +108,7 @@ function drawButtons(
     if (buttonStates[buttonNames[i]] === "disabled") {
       p.tint(255, 128);
     } else if (mouseFrames === 1 && hoveredButton === buttonNames[i]) {
-      onButtonPress(p, buttonNames[i]);
+      onButtonPress(buttonNames[i]);
       mouseConsumed.value = true;
     }
     if (buttonStates[buttonNames[i]] === "active") {
@@ -174,7 +174,7 @@ function getHoveredButton(
 //  }
 //}
 
-function onButtonPress(p: p5, button: ButtonName) {
+function onButtonPress(button: ButtonName) {
   if (buttonStates[button] === "disabled") {
     return;
   }

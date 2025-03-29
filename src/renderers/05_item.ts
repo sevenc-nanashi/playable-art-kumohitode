@@ -36,8 +36,8 @@ export const draw = import.meta.hmrify((p: p5) => {
   }
 
   const mousePos = getMousePos(p);
-  updateCamera(p, mousePos);
-  updateArp(p, mousePos);
+  updateCamera(mousePos);
+  updateArp(mousePos);
 });
 
 const distance = (a: { x: number; y: number }, b: { x: number; y: number }) =>
@@ -48,7 +48,7 @@ if (import.meta.hot) {
     arpGainNode.disconnect();
   });
 }
-function updateArp(p: p5, mousePos: { x: number; y: number }) {
+function updateArp(mousePos: { x: number; y: number }) {
   const currentBeat = getCurrentBeat();
   if (currentBeat - lastPlayedBeat >= 16) {
     const source = audioContext.createBufferSource();
@@ -65,7 +65,7 @@ function updateArp(p: p5, mousePos: { x: number; y: number }) {
   }
 }
 
-function updateCamera(p: p5, mousePos: { x: number; y: number }) {
+function updateCamera(mousePos: { x: number; y: number }) {
   const cameraDist = distance(cameraPosition, { x: mousePos.x, y: mousePos.y });
   if (cameraDist < 10 && getMouseFrames() === 1) {
     mouseConsumed.value = true;

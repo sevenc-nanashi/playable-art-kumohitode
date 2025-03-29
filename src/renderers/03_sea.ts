@@ -11,7 +11,6 @@ import {
   myPreload,
   useDrawingContext,
 } from "../utils";
-import { frameRate, framesPerBeat } from "../consts";
 import { clip, easeOutQuart, unlerp } from "../easing";
 
 let shader: p5.Shader;
@@ -20,8 +19,6 @@ let seaImage: p5.Image;
 let maskImage: p5.Image;
 let seaBuffer: AudioBuffer;
 let seaSoundGain: GainNode;
-
-let startQueue = false;
 
 const seaWidth = 168;
 const seaHeight = 84;
